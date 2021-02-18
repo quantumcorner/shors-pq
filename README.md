@@ -48,9 +48,10 @@ Is there a way to seed the Simulator?
 #### Factoring results are not calculated effectively
 
 In the output below, one can see that the first trial resulted in a period of 91.
-The number 91 is evenly divisible by 17 and could have been used to determine that
-17 is a factor.  But the algorithm did not do this.
+The number 91 is nearly evenly divisible by 17 and possibly could have been used to determine that
+17 is a factor.  But the algorithm did not do this. It looks for perfect divisors.
 The effect is that the program fails to factor most numbers above 256 or so.
+Perhaps the algorithm could be modifed to test for 'close matches'? 
 
 Additionally, the period determined by the QFT algorithm is often not evenly divisible, especially with larger numbers.
 Is there a way to improve the quality of the QFT result?
