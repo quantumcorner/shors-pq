@@ -46,41 +46,41 @@ def set_execution_target(backend_id='simulator', num_runs=100, verbose=False, us
 # the 'base' of exponentiation, and the number of qubits required 'input_size'
 
 def ShorsAlgorithm(eng_in, input_size, number, base, verbose=verbose):
-
-    eng = copy.copy(eng_in)
-    qureg = eng.allocate_qureg(input_size)
-    
-    N = number
-    a = base
     
     # Create count of qubits to use to represent the number to factor
+    # NOTE: this should match the input_size, but is calculated here to be sure
     n = int(math.ceil(math.log(number, 2)))
     
     if verbose:
-        print(f"... running Shors to factor number [ {number} ] with base={a} using num_qubits={n}")
+        print(f"... running Shors to factor number [ {number} ] with base={base} using num_qubits={n}")
     
-    #x = eng.allocate_qureg(n)
-    x = qureg
-    
-    X | x[0]
+    # Create an engine and allocate necessary qubits
+    eng = copy.copy(eng_in)
+    qureg = eng.allocate_qureg(n)
 
-    measurements = [0] * (2 * n)  # will hold the 2n measurement results
+    # this will hold the 2n measurement results
+    measurements = [0] * (2 * n)
 
+    # create a single control qubit
     ctrl_qubit = eng.allocate_qubit()
-
+  
+    # the QFT algorithm 
+    
+    X | qureg[0]
+    
     if verbose:
         print("  ", end="")
-        
+    
+    # perform modular exponentiation 2*n times
     for k in range(2 * n):
+    
         t = (2 * n - 1 - k)
-        tt = 1 << t
-        
-        current_a = pow(a, t, number)
+        current_a = pow(base, t, number)
         
         # one iteration of 1-qubit QPE
         H | ctrl_qubit
         with Control(eng, ctrl_qubit):
-            MultiplyByConstantModN(current_a, number) | x
+            MultiplyByConstantModN(current_a, number) | qureg
 
         # perform inverse QFT --> Rotations conditioned on previous outcomes
         for i in range(k):
@@ -88,34 +88,36 @@ def ShorsAlgorithm(eng_in, input_size, number, base, verbose=verbose):
                 R(-math.pi/(1 << (k - i))) | ctrl_qubit
         H | ctrl_qubit
 
-        # and measure
         Measure | ctrl_qubit
+        
+        # execute the circuit and measure control qubit
         eng.flush()
         measurements[k] = int(ctrl_qubit)
+        
+        # reset the control qubit (flip if it is a 1)
         if measurements[k]:
             X | ctrl_qubit
 
         if verbose:
             print(f"{measurements[k]}", end="")
-            #print(f" -- {k} {current_a} {t} {tt}")
             sys.stdout.flush()
             
     if verbose:
         print("")
         
-    # not even used, can we remove ?
-    All(Measure) | x
+    # measure all the qubits in number register
+    All(Measure) | qureg
         
     # turn the measured values into a number in [0,1) by summing their binary values
     ma = [(measurements[2 * n - 1 - i]*1. / (1 << (i + 1))) for i in range(2 * n)]
     y = sum(ma)
-    
-    ## print(y)
 
     # continued fraction expansion to get denominator (the period?)
     r = Fraction(y).limit_denominator(number - 1).denominator
     f = Fraction(y).limit_denominator(number - 1)
-    ## print(f"   lim = {f.numerator} / {f.denominator}")
+    
+    if verbose:
+        print(f"  ... y = {y}  fraction = {f.numerator} / {f.denominator}  r = {f.denominator}")
 
     # return the (potential) period
     return r
