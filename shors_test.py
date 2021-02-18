@@ -227,17 +227,24 @@ def run (num_shots=100, verbose=verbose):
 # For interactive testing
 def do_interactive_test(blank_eng, verbose):
 
-    number = int(input('Enter the number to factor: '))
-    print(f"Factoring number = {number}\n")
-    
-    input_size = int(math.ceil(math.log(number, 2)))
-    
-    # attempt to execute Shor's Algorithm to find factors
-    failures = attempt_factoring(blank_eng, input_size, number, verbose)
-    
-    # Report how many factoring failures occurred
-    if failures > 0:
-        print(f"*** Factoring attempts failed {failures} times!")
+    done = False
+    while not done:
+        
+        s = input('\nEnter the number to factor: ')
+        if len(s) < 1:
+            break
+        
+        number = int(s)
+        print(f"Factoring number = {number}\n")
+        
+        input_size = int(math.ceil(math.log(number, 2)))
+        
+        # attempt to execute Shor's Algorithm to find factors
+        failures = attempt_factoring(blank_eng, input_size, number, verbose)
+        
+        # Report how many factoring failures occurred
+        if failures > 0:
+            print(f"*** Factoring attempts failed {failures} times!")
             
 
 # if main, execute method
