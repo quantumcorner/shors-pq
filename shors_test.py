@@ -192,10 +192,10 @@ def attempt_factoring(blank_eng, input_size, number, verbose):
         base = choose_random_base(number)
         if base == 0: break
 
-        #eng, qureg = ShorsAlgorithm(blank_eng, input_size, number, base)
+        # execute the algorithm which determines the period given this base
         r = ShorsAlgorithm(blank_eng, input_size, number, base, verbose=verbose)
 
-        # try to determine the factors
+        # try to determine the factors from the period  'r'
         f1, f2 = determine_factors(r, base, number)
 
         # Success! if these are the factors and both are greater than 1
