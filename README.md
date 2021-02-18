@@ -53,7 +53,7 @@ The number 91 is evenly divisible by 17 and could have been used to determine th
 The effect is that the program fails to factor most numbers above 256 or so.
 
 Additionally, the period determined by the QFT algorithm is often not evenly divisible, especially with larger numbers.
-is there a way to improve the quality of the QFT result?
+Is there a way to improve the quality of the QFT result?
 
 ```
 Shor's Factoring Algorithm - ProjectQ
