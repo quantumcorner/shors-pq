@@ -19,6 +19,8 @@ However, the code that follows that line could never have been reached.
 This needs to be clarified with the ProjectQ team.
 In the code snippet below the 'print' line indicates the place at which the subsequent code would never be reached, even in the unedited original source code in the ProjectQ documentation.
 
+Note: this code is not currently used in this example ... should it be?
+
 ```
 # Filter function, which defines the gate set for the first optimization
 # (don't decompose QFTs and iQFTs to make cancellation easier)
